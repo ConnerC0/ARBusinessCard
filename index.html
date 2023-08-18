@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google" content="notranslate">
     <title>AR Business Card</title>
     <style>
         body {
@@ -39,7 +38,7 @@
             alert('XR permissions denied. Cannot start AR.');
             return;  // Exit the function if permissions are denied.
         }
-        
+
         // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
         const canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
