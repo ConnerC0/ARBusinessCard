@@ -31,76 +31,50 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    directionalLight.position.set(10, 15, 10);
-    scene.add(directionalLight);
-    const renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        preserveDrawingBuffer: true,
-        canvas: canvas,
-        context: gl
-    });
-    renderer.autoClear = false;
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('ar-container').appendChild(renderer.domElement);
-
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-
-    // Load the texture for the resume
-    const resumeTexture = new THREE.TextureLoader().load('path-to-your-resume-image.jpg');
-
-    // Global variable to store the resume plane
-    let resumePlane;
-
-    function showResume() {
-        const aspectRatio = resumeTexture.image.width / resumeTexture.image.height;
-        const planeGeometry = new THREE.PlaneGeometry(4 * aspectRatio, 4);  // Adjust the size as needed
-        const planeMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture, side: THREE.DoubleSide });
-        resumePlane = new THREE.Mesh(planeGeometry, planeMaterial);
-        resumePlane.position.set(0, 0, -5);
-        scene.add(resumePlane);
-    }
-
-    function onButtonClick(mesh, url) {
-        mesh.material.color.set(0xff0000);  // Change color to red as a click effect
-        setTimeout(() => {
-            mesh.material.color.set(0x007bff);  // Reset color after 500ms
-            if (url) {
-                window.location.href = url;
-            } else {
-                // Display contact info or resume
-                if (mesh === resumeButton) {
-                    if (!resumePlane) {
-                        showResume();
-                    } else {
-                        scene.remove(resumePlane);
-                        resumePlane = null;
-                    }
-                } else {
-                    // Add your showContactInfo() function logic here
-                }
-            }
-        }, 500);
-    }
-
-    // Set up XR session
-    let xrButton = document.getElementById('arButton'); // Getting the button by its ID
-    let session = null; // To keep track of the current XR session
-    let referenceSpace = null;
-
-    // Check if AR is supported
-    navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
-        if (!supported) {
-            xrButton.disabled = true;
-            xrButton.textContent = 'AR not supported';
-        }
-        xrButton.addEventListener('click', onButtonClicked);
-    });
-
     async function onButtonClicked() {
+        // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
+        const canvas = document.createElement("canvas");
+        document.body.appendChild(canvas);
+        const gl = canvas.getContext("webgl", {xrCompatible: true});
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+        directionalLight.position.set(10, 15, 10);
+        scene.add(directionalLight);
+        const renderer = new THREE.WebGLRenderer({
+            alpha: true,
+            preserveDrawingBuffer: true,
+            canvas: canvas,
+            context: gl
+        });
+        renderer.autoClear = false;
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('ar-container').appendChild(renderer.domElement);
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // Load the texture for the resume
+        const resumeTexture = new THREE.TextureLoader().load('path-to-your-resume-image.jpg');
+
+        // Global variable to store the resume plane
+        let resumePlane;
+
+        // Set up XR session
+        let xrButton = document.getElementById('arButton'); // Getting the button by its ID
+        let session = null; // To keep track of the current XR session
+        let referenceSpace = null;
+
+        // Check if AR is supported
+        navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+            if (!supported) {
+                xrButton.disabled = true;
+                xrButton.textContent = 'AR not supported';
+            }
+            xrButton.addEventListener('click', onButtonClicked);
+        });
+
         if (!session) {
             try {
                 session = await navigator.xr.requestSession('immersive-ar');
@@ -124,87 +98,119 @@
         } else {
             session.end(); // End the session if already running
         }
-    }
 
-    function onSessionEnded() {
-        // Clean up resources
-        session.removeEventListener('end', onSessionEnded);
-        xrButton.textContent = 'Enter AR';
-        session = null; // Reset the session
-    }
-
-    renderer.domElement.addEventListener('click', (event) => {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        raycaster.setFromCamera(mouse, camera);
-
-        const intersects = raycaster.intersectObjects(scene.children);
-        for (let i = 0; i < intersects.length; i++) {
-            if (intersects[i].object === githubButton) {
-                onButtonClick(githubButton, 'https://github.com/ConnerC0');
-            } else if (intersects[i].object === linkedinButton) {
-                onButtonClick(linkedinButton, 'https://www.linkedin.com/in/conner-curtis/');
-            } else if (intersects[i].object === contactButton) {
-                onButtonClick(contactButton);
-            } else if (intersects[i].object === resumeButton) {
-                onButtonClick(resumeButton);
-            } else if (intersects[i].object === resumePlane) {
-                scene.remove(resumePlane);
-                resumePlane = null;
-            }
-        }
-    });
-
-    // ... [Your other button setups and 3D objects]
-
-    // button setup
-    const buttonGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
-    const buttonMaterial = new THREE.MeshBasicMaterial({ color: 0x007bff });
-
-    const githubButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-    githubButton.position.set(-1.5, 0, -4);
-    scene.add(githubButton);
-
-    const linkedinButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-    linkedinButton.position.set(-0.5, 0, -4);
-    scene.add(linkedinButton);
-
-    const contactButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-    contactButton.position.set(0.5, 0, -4);
-    scene.add(contactButton);
-
-    const resumeButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-    resumeButton.position.set(1.5, 0, -4);
-    scene.add(resumeButton);
-
-    // Camera setup
-    camera.position.z = 5;
-
-    function onXRFrame(timestamp, frame) {
-        // Update the camera pose
-        const pose = frame.getViewerPose(referenceSpace);
-        if (pose) {
-            for (let view of pose.views) {
-                camera.matrix.fromArray(view.transform.matrix);
-                camera.updateMatrixWorld(true);
-            }
+        function onSessionEnded() {
+            // Clean up resources
+            session.removeEventListener('end', onSessionEnded);
+            xrButton.textContent = 'Enter AR';
+            session = null; // Reset the session
         }
 
-        // Render the scene
-        renderer.render(scene, camera);
+        function showResume() {
+            const aspectRatio = resumeTexture.image.width / resumeTexture.image.height;
+            const planeGeometry = new THREE.PlaneGeometry(4 * aspectRatio, 4);  // Adjust the size as needed
+            const planeMaterial = new THREE.MeshBasicMaterial({map: resumeTexture, side: THREE.DoubleSide});
+            resumePlane = new THREE.Mesh(planeGeometry, planeMaterial);
+            resumePlane.position.set(0, 0, -5);
+            scene.add(resumePlane);
+        }
 
-        // Continue to the next frame
-        session.requestAnimationFrame(onXRFrame);
+        function onButtonClick(mesh, url) {
+            mesh.material.color.set(0xff0000);  // Change color to red as a click effect
+            setTimeout(() => {
+                mesh.material.color.set(0x007bff);  // Reset color after 500ms
+                if (url) {
+                    window.location.href = url;
+                } else {
+                    // Display contact info or resume
+                    if (mesh === resumeButton) {
+                        if (!resumePlane) {
+                            showResume();
+                        } else {
+                            scene.remove(resumePlane);
+                            resumePlane = null;
+                        }
+                    } else {
+                        // Add your showContactInfo() function logic here
+                    }
+                }
+            }, 500);
+        }
+
+
+        renderer.domElement.addEventListener('click', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(scene.children);
+            for (let i = 0; i < intersects.length; i++) {
+                if (intersects[i].object === githubButton) {
+                    onButtonClick(githubButton, 'https://github.com/ConnerC0');
+                } else if (intersects[i].object === linkedinButton) {
+                    onButtonClick(linkedinButton, 'https://www.linkedin.com/in/conner-curtis/');
+                } else if (intersects[i].object === contactButton) {
+                    onButtonClick(contactButton);
+                } else if (intersects[i].object === resumeButton) {
+                    onButtonClick(resumeButton);
+                } else if (intersects[i].object === resumePlane) {
+                    scene.remove(resumePlane);
+                    resumePlane = null;
+                }
+            }
+        });
+
+        // ... [Your other button setups and 3D objects]
+
+        // button setup
+        const buttonGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
+        const buttonMaterial = new THREE.MeshBasicMaterial({color: 0x007bff});
+
+        const githubButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
+        githubButton.position.set(-1.5, 0, -4);
+        scene.add(githubButton);
+
+        const linkedinButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
+        linkedinButton.position.set(-0.5, 0, -4);
+        scene.add(linkedinButton);
+
+        const contactButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
+        contactButton.position.set(0.5, 0, -4);
+        scene.add(contactButton);
+
+        const resumeButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
+        resumeButton.position.set(1.5, 0, -4);
+        scene.add(resumeButton);
+
+        // Camera setup
+        camera.position.z = 5;
+
+        function onXRFrame(timestamp, frame) {
+            // Update the camera pose
+            const pose = frame.getViewerPose(referenceSpace);
+            if (pose) {
+                for (let view of pose.views) {
+                    camera.matrix.fromArray(view.transform.matrix);
+                    camera.updateMatrixWorld(true);
+                }
+            }
+
+            // Render the scene
+            renderer.render(scene, camera);
+
+            // Continue to the next frame
+            session.requestAnimationFrame(onXRFrame);
+        }
+
+        // Regular Render loop (for non-AR view)
+        const animate = () => {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        };
+
+        animate();
     }
-
-    // Regular Render loop (for non-AR view)
-    const animate = () => {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-    };
-
-    animate();
 
 </script>
 </body>
