@@ -22,7 +22,6 @@
 </head>
 
 <body>
-<div id="ar-container"></div>
 <button id="arButton">Enter AR</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -46,7 +45,6 @@
         });
         renderer.autoClear = false;
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('ar-container').appendChild(renderer.domElement);
 
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
@@ -59,8 +57,14 @@
 
         // Set up XR session
         let xrButton = document.getElementById('arButton'); // Getting the button by its ID
-        let session = null; // To keep track of the current XR session
-        let referenceSpace = null;
+        const session = await navigator.xr.requestSession('immersive-ar'); // To keep track of the current XR session
+        xrButton.textContent = 'Exit AR';
+
+        session.updateRenderState({
+            baseLayer: new XRWebGLLayer(session, renderer.context)
+        });
+
+        const referenceSpace = await session.requestReferenceSpace('local');
 
         // Check if AR is supported
         navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
@@ -70,37 +74,6 @@
             }
             xrButton.addEventListener('click', onButtonClicked);
         });
-
-        if (!session) {
-            try {
-                session = await navigator.xr.requestSession('immersive-ar');
-                xrButton.textContent = 'Exit AR';
-
-                session.updateRenderState({
-                    baseLayer: new XRWebGLLayer(session, renderer.context)
-                });
-
-                // Create an XR reference space
-                referenceSpace = await session.requestReferenceSpace('local');
-
-                // Handle session end
-                session.addEventListener('end', onSessionEnded);
-
-                // Begin the AR render loop
-                session.requestAnimationFrame(onXRFrame);
-            } catch (error) {
-                console.error('Error starting XR session:', error);
-            }
-        } else {
-            session.end(); // End the session if already running
-        }
-
-        function onSessionEnded() {
-            // Clean up resources
-            session.removeEventListener('end', onSessionEnded);
-            xrButton.textContent = 'Enter AR';
-            session = null; // Reset the session
-        }
 
         function showResume() {
             const aspectRatio = resumeTexture.image.width / resumeTexture.image.height;
@@ -182,30 +155,34 @@
         // Camera setup
         camera.position.z = 5;
 
-        function onXRFrame(timestamp, frame) {
-            // Update the camera pose
+        const onXRFrame = (time, frame) => {
+            // Queue up the next draw request.
+            session.requestAnimationFrame(onXRFrame);
+
+            // Bind the graphics framebuffer to the baseLayer's framebuffer
+            gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
+
+            // Retrieve the pose of the device.
+            // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
             const pose = frame.getViewerPose(referenceSpace);
             if (pose) {
-                for (let view of pose.views) {
-                    camera.matrix.fromArray(view.transform.matrix);
-                    camera.updateMatrixWorld(true);
-                }
+                // In mobile AR, we only have one view.
+                const view = pose.views[0];
+
+                const viewport = session.renderState.baseLayer.getViewport(view);
+                renderer.setSize(viewport.width, viewport.height)
+
+                // Use the view's transform matrix and projection matrix to configure the THREE.camera.
+                camera.matrix.fromArray(view.transform.matrix)
+                camera.projectionMatrix.fromArray(view.projectionMatrix);
+                camera.updateMatrixWorld(true);
+
+
+                // Render the scene with THREE.WebGLRenderer.
+                renderer.render(scene, camera)
             }
-
-            // Render the scene
-            renderer.render(scene, camera);
-
-            // Continue to the next frame
-            session.requestAnimationFrame(onXRFrame);
         }
-
-        // Regular Render loop (for non-AR view)
-        const animate = () => {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        };
-
-        animate();
+        session.requestAnimationFrame(onXRFrame);
     }
 
 </script>
