@@ -138,28 +138,35 @@
 
         // ... [Your other button setups and 3D objects]
 
-        // button setup
-        const buttonGeometry = new THREE.BoxGeometry(0.5, 0.2, 0.1);
-        const buttonMaterial = new THREE.MeshBasicMaterial({color: 0x007bff});
+        // Define different colors for the buttons
+        const githubColor = 0xFF5733;  // Example color for Github button
+        const linkedinColor = 0x33FF57;  // Example color for LinkedIn button
+        const contactColor = 0x3357FF;  // Example color for Contact button
+        const resumeColor = 0xFF33D6;  // Example color for Resume button
 
-        const githubButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-        githubButton.position.set(0, -1, -4);
+        // Button setup
+        const buttonGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
+
+        const githubMaterial = new THREE.MeshBasicMaterial({color: githubColor});
+        const linkedinMaterial = new THREE.MeshBasicMaterial({color: linkedinColor});
+        const contactMaterial = new THREE.MeshBasicMaterial({color: contactColor});
+        const resumeMaterial = new THREE.MeshBasicMaterial({color: resumeColor});
+
+        const githubButton = new THREE.Mesh(buttonGeometry, githubMaterial);
+        githubButton.position.set(0, 1.5, -4); // Topmost position
         scene.add(githubButton);
 
-        const linkedinButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-        linkedinButton.position.set(0, 0, -4);
+        const linkedinButton = new THREE.Mesh(buttonGeometry, linkedinMaterial);
+        linkedinButton.position.set(0, 1.2 - 0.3, -4); // 0.3 units below the Github button
         scene.add(linkedinButton);
 
-        const contactButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-        contactButton.position.set(0, 1, -4);
+        const contactButton = new THREE.Mesh(buttonGeometry, contactMaterial);
+        contactButton.position.set(0, 0.9 - 2*0.3, -4); // 0.6 units below the Github button
         scene.add(contactButton);
 
-        const resumeButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-        resumeButton.position.set(0, 2, -4);
+        const resumeButton = new THREE.Mesh(buttonGeometry, resumeMaterial);
+        resumeButton.position.set(0, 0.6 - 3*0.3, -4); // 0.9 units below the Github button
         scene.add(resumeButton);
-
-        // Camera setup
-        camera.position.z = 5;
 
         const onXRFrame = (time, frame) => {
             // Queue up the next draw request.
