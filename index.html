@@ -12,7 +12,7 @@
         }
 
         canvas {
-            z-index: 1;
+            z-index: -2;
         }
 
         #arButton {
@@ -21,7 +21,7 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
-            z-index: 2;
+            z-index: -1;
         }
     </style>
 </head>
@@ -32,11 +32,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 
-    const {state} = await navigator.permissions.query({ name: 'xr' });
-    if (state === 'denied') {
-        alert('XR permissions denied. Cannot start AR.');
-        return;
-    }
     async function onButtonClicked() {
         // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
         const canvas = document.createElement("canvas");
@@ -71,9 +66,7 @@
         let resumePlane;
 
         // Set up XR session
-        let xrButton = document.getElementById('arButton');
         const session = await navigator.xr.requestSession('immersive-ar'); // To keep track of the current XR session
-        xrButton.textContent = 'Exit AR';
 
         session.updateRenderState({
             baseLayer: new XRWebGLLayer(session, renderer.context)
@@ -157,15 +150,15 @@
         scene.add(githubButton);
 
         const linkedinButton = new THREE.Mesh(buttonGeometry, linkedinMaterial);
-        linkedinButton.position.set(0, 1.2 - 0.3, -4); // 0.3 units below the Github button
+        linkedinButton.position.set(0, 0.9, -4); // 0.3 units below the Github button
         scene.add(linkedinButton);
 
         const contactButton = new THREE.Mesh(buttonGeometry, contactMaterial);
-        contactButton.position.set(0, 0.9 - 2*0.3, -4); // 0.6 units below the Github button
+        contactButton.position.set(0, 0.3, -4); // 0.6 units below the Github button
         scene.add(contactButton);
 
         const resumeButton = new THREE.Mesh(buttonGeometry, resumeMaterial);
-        resumeButton.position.set(0, 0.6 - 3*0.3, -4); // 0.9 units below the Github button
+        resumeButton.position.set(0, -0.3, -4); // 0.9 units below the Github button
         scene.add(resumeButton);
 
         const onXRFrame = (time, frame) => {
