@@ -31,7 +31,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-    
+
     async function onButtonClicked() {
 
         const {state} = await navigator.permissions.query({ name: 'xr' });
@@ -39,11 +39,20 @@
             alert('XR permissions denied. Cannot start AR.');
             return;
         }
+        if (!navigator.xr) {
+            alert("WebXR is not supported on this device/browser.");
+            return;
+        }
 
         // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
         const canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
         const gl = canvas.getContext("webgl", {xrCompatible: true});
+
+        if (!gl) {
+            alert("WebGL context could not be initialized. AR might not be supported.");
+            return;
+        }
 
         const scene = new THREE.Scene();
 
