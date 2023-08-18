@@ -32,6 +32,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 
+    const {state} = await navigator.permissions.query({ name: 'xr' });
+    if (state === 'denied') {
+        alert('XR permissions denied. Cannot start AR.');
+    }
+
     async function onButtonClicked() {
         // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
         const canvas = document.createElement("canvas");
