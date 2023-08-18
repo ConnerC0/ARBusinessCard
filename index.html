@@ -117,9 +117,9 @@
         const intersects = raycaster.intersectObjects(scene.children);
         for (let i = 0; i < intersects.length; i++) {
             if (intersects[i].object === githubButton) {
-                onButtonClick(githubButton, 'https://github.com/your-username');
+                onButtonClick(githubButton, 'https://github.com/ConnerC0');
             } else if (intersects[i].object === linkedinButton) {
-                onButtonClick(linkedinButton, 'https://linkedin.com/in/your-username');
+                onButtonClick(linkedinButton, 'https://www.linkedin.com/in/conner-curtis/');
             } else if (intersects[i].object === contactButton) {
                 onButtonClick(contactButton);
             } else if (intersects[i].object === resumeButton) {
@@ -133,12 +133,24 @@
 
     // ... [Your other button setups and 3D objects]
 
-    // Resume button setup
+    // button setup
     const buttonGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
     const buttonMaterial = new THREE.MeshBasicMaterial({ color: 0x007bff });
 
+    const githubButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
+    githubButton.position.set(-1.5, 0, -4);
+    scene.add(githubButton);
+
+    const linkedinButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
+    linkedinButton.position.set(-0.5, 0, -4);
+    scene.add(linkedinButton);
+
+    const contactButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
+    contactButton.position.set(0.5, 0, -4);
+    scene.add(contactButton);
+
     const resumeButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-    resumeButton.position.set(0, 0, -4);
+    resumeButton.position.set(1.5, 0, -4);
     scene.add(resumeButton);
 
     // Camera setup
