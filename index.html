@@ -143,19 +143,19 @@
         const buttonMaterial = new THREE.MeshBasicMaterial({color: 0x007bff});
 
         const githubButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-        githubButton.position.set(-1, 0, -4);
+        githubButton.position.set(0, -1, -4);
         scene.add(githubButton);
 
         const linkedinButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-        linkedinButton.position.set(-2, 0, -4);
+        linkedinButton.position.set(0, 0, -4);
         scene.add(linkedinButton);
 
         const contactButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-        contactButton.position.set(1, 0, -4);
+        contactButton.position.set(0, 1, -4);
         scene.add(contactButton);
 
         const resumeButton = new THREE.Mesh(buttonGeometry, buttonMaterial);
-        resumeButton.position.set(2, 0, -4);
+        resumeButton.position.set(0, 2, -4);
         scene.add(resumeButton);
 
         // Camera setup
