@@ -14,11 +14,20 @@
         canvas {
             display: block;
         }
+
+        #arButton {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+        }
     </style>
 </head>
 
 <body>
 <div id="ar-container"></div>
+<button id="arButton">Enter AR</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -69,43 +78,46 @@
     }
 
     // Set up XR session
-    let xrButton = null;
+    let xrButton = document.getElementById('arButton'); // Getting the button by its ID
+    let session = null; // To keep track of the current XR session
+    let referenceSpace = null;
 
+    // Check if AR is supported
     navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
-        if (supported) {
-            xrButton = document.createElement('button');
-            xrButton.textContent = 'Enter AR';
-            xrButton.addEventListener('click', onButtonClicked);
-            document.body.appendChild(xrButton);
-        } else {
-            console.log('AR not supported');
+        if (!supported) {
+            xrButton.disabled = true;
+            xrButton.textContent = 'AR not supported';
         }
+        xrButton.addEventListener('click', onButtonClicked);
     });
 
     async function onButtonClicked() {
-        try {
-            const session = await navigator.xr.requestSession('immersive-ar');
-            xrButton.style.display = 'none';
+        if (!session) {
+            try {
+                session = await navigator.xr.requestSession('immersive-ar');
+                xrButton.textContent = 'Exit AR';
 
-            // Create an XR reference space
-            const referenceSpace = await session.requestReferenceSpace('local');
+                // Create an XR reference space
+                referenceSpace = await session.requestReferenceSpace('local');
 
-            // Handle session end
-            session.addEventListener('end', onSessionEnded);
+                // Handle session end
+                session.addEventListener('end', onSessionEnded);
 
-            function onSessionEnded() {
-                // Clean up resources
-                session.removeEventListener('end', onSessionEnded);
+                // Begin the AR render loop
+                session.requestAnimationFrame(onXRFrame);
+            } catch (error) {
+                console.error('Error starting XR session:', error);
             }
-
-            // Render the scene
-            renderer.render(scene, camera);
-
-            // Continue to the next frame
-            session.requestAnimationFrame(onXRFrame);
-        } catch (error) {
-            console.error('Error starting XR session:', error);
+        } else {
+            session.end(); // End the session if already running
         }
+    }
+
+    function onSessionEnded() {
+        // Clean up resources
+        session.removeEventListener('end', onSessionEnded);
+        xrButton.textContent = 'Enter AR';
+        session = null; // Reset the session
     }
 
     renderer.domElement.addEventListener('click', (event) => {
@@ -160,8 +172,10 @@
         // Update the camera pose
         const pose = frame.getViewerPose(referenceSpace);
         if (pose) {
-            camera.matrix.fromArray(pose.transform.matrix);
-            camera.updateMatrixWorld(true);
+            for (let view of pose.views) {
+                camera.matrix.fromArray(view.transform.matrix);
+                camera.updateMatrixWorld(true);
+            }
         }
 
         // Render the scene
