@@ -22,7 +22,7 @@
 </head>
 
 <body>
-<button id="arButton">Enter AR</button>
+<button id="arButton" onclick="onButtonClicked()">Enter AR</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -56,7 +56,7 @@
         let resumePlane;
 
         // Set up XR session
-        let xrButton = document.getElementById('arButton'); // Getting the button by its ID
+        let xrButton = document.getElementById('arButton');
         const session = await navigator.xr.requestSession('immersive-ar'); // To keep track of the current XR session
         xrButton.textContent = 'Exit AR';
 
@@ -72,7 +72,7 @@
                 xrButton.disabled = true;
                 xrButton.textContent = 'AR not supported';
             }
-            xrButton.addEventListener('click', onButtonClicked);
+            //xrButton.addEventListener('click', onButtonClicked);
         });
 
         function showResume() {
