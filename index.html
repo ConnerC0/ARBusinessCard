@@ -11,12 +11,17 @@
             overflow: hidden;
         }
 
+        canvas {
+            z-index: 1;
+        }
+
         #arButton {
             position: absolute;
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
+            z-index: 2;
         }
     </style>
 </head>
@@ -26,6 +31,12 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+
+    const {state} = await navigator.permissions.query({ name: 'xr' });
+    if (state === 'denied') {
+        alert('XR permissions denied. Cannot start AR.');
+        return;
+    }
     async function onButtonClicked() {
         // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
         const canvas = document.createElement("canvas");
@@ -33,10 +44,11 @@
         const gl = canvas.getContext("webgl", {xrCompatible: true});
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
         directionalLight.position.set(10, 15, 10);
         scene.add(directionalLight);
+
         const renderer = new THREE.WebGLRenderer({
             alpha: true,
             preserveDrawingBuffer: true,
@@ -45,6 +57,9 @@
         });
         renderer.autoClear = false;
         renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const camera = new THREE.PerspectiveCamera();
+        camera.matrixAutoUpdate = false;
 
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
@@ -65,15 +80,6 @@
         });
 
         const referenceSpace = await session.requestReferenceSpace('local');
-
-        // Check if AR is supported
-        navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
-            if (!supported) {
-                xrButton.disabled = true;
-                xrButton.textContent = 'AR not supported';
-            }
-            //xrButton.addEventListener('click', onButtonClicked);
-        });
 
         function showResume() {
             const aspectRatio = resumeTexture.image.width / resumeTexture.image.height;
