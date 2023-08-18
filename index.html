@@ -33,7 +33,16 @@
 <script>
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    directionalLight.position.set(10, 15, 10);
+    scene.add(directionalLight);
+    const renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        preserveDrawingBuffer: true,
+        canvas: canvas,
+        context: gl
+    });
+    renderer.autoClear = false;
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('ar-container').appendChild(renderer.domElement);
 
@@ -96,6 +105,10 @@
             try {
                 session = await navigator.xr.requestSession('immersive-ar');
                 xrButton.textContent = 'Exit AR';
+
+                session.updateRenderState({
+                    baseLayer: new XRWebGLLayer(session, renderer.context)
+                });
 
                 // Create an XR reference space
                 referenceSpace = await session.requestReferenceSpace('local');
