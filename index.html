@@ -3,33 +3,16 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Business Card</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Hello WebXR!</title>
 
-        canvas {
-            z-index: 1;
-        }
-
-        #arButton {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            z-index: 2;
-        }
-    </style>
+    <!-- three.js -->
+    <script src="https://unpkg.com/three@0.126.0/build/three.js"></script>
+    <script src="https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
-
 <body>
 <button onclick="activateXR()">Start Hello WebXR</button>
-
-<script src="https://unpkg.com/three@0.126.0/build/three.js"></script>
 <script>
 
     async function activateXR() {
