@@ -27,9 +27,9 @@
 </head>
 
 <body>
-<button id="arButton" onclick="onButtonClicked()">Enter AR</button>
+<button onclick="activateXR()">Start Hello WebXR</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/three@0.126.0/build/three.js"></script>
 <script>
 
     async function activateXR() {
@@ -70,7 +70,7 @@
         // near the viewer's position at the time the session was created.
         const referenceSpace = await session.requestReferenceSpace('local');
 
-        
+
 
 
         // Create a render loop that allows us to draw on the AR view.
