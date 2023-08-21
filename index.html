@@ -52,7 +52,47 @@
         // near the viewer's position at the time the session was created.
         const referenceSpace = await session.requestReferenceSpace('local');
 
+        // Create buttons
+        const buttonSize = 0.1;
+        const buttonSpacing = 0.15; // Spacing between buttons
+        const buttonMaterial = new THREE.MeshBasicMaterial({color: 0x00ff00});
 
+        const githubButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, buttonSize), buttonMaterial);
+        githubButton.position.set(0, 0.3, -1);  // Start from the topmost button
+        githubButton.userData = { type: 'link', url: 'https://github.com/ConnerC0' };
+        scene.add(githubButton);
+
+        const linkedinButton = githubButton.clone();
+        linkedinButton.position.set(0, 0.3 - buttonSpacing, -1);  // Move down by buttonSpacing
+        linkedinButton.userData.url = 'https://www.linkedin.com/in/conner-curtis/';
+        scene.add(linkedinButton);
+
+        const contactButton = githubButton.clone();
+        contactButton.position.set(0, 0.3 - 2 * buttonSpacing, -1);  // Move down by 2 x buttonSpacing
+        contactButton.userData = { type: 'image', src: 'images/ContactInfo.png' };
+        scene.add(contactButton);
+
+        const resumeButton = githubButton.clone();
+        resumeButton.position.set(0, 0.3 - 3 * buttonSpacing, -1);  // Move down by 3 x buttonSpacing
+        resumeButton.userData = { type: 'image', src: 'images/Conner_Curtis_Resume.png' };
+        scene.add(resumeButton);
+
+        // To handle touch interactivity
+        session.addEventListener('selectstart', () => {
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(new THREE.Vector2(), camera);
+            const intersects = raycaster.intersectObjects([githubButton, linkedinButton, contactButton, resumeButton]);
+
+            if (intersects.length > 0) {
+                const object = intersects[0].object;
+                if (object.userData.type === 'link') {
+                    window.location.href = object.userData.url;
+                } else if (object.userData.type === 'image') {
+                    // Display your image. You can replace the following line with more advanced image displaying methods.
+                    alert('Show image from: ' + object.userData.src);
+                }
+            }
+        });
 
 
         // Create a render loop that allows us to draw on the AR view.
