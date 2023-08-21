@@ -34,6 +34,12 @@
 
     async function onButtonClicked() {
 
+        const {state} = await navigator.permissions.query({ name: 'xr' });
+        if (state === 'denied') {
+            alert('XR permissions denied. Cannot start AR.');
+            return;
+        }
+
         const canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
         const gl = canvas.getContext("webgl", { xrCompatible: true });
