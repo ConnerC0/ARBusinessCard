@@ -53,7 +53,7 @@
         const referenceSpace = await session.requestReferenceSpace('local');
 
         // Create buttons
-        const buttonSize = .05;
+        const buttonSize = .5;
         const buttonMaterial = new THREE.MeshBasicMaterial({color: 0x000000});
 
         const githubButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, buttonSize), new THREE.MeshBasicMaterial({color: 0x000000}));
@@ -62,17 +62,17 @@
         scene.add(githubButton);
 
         const linkedinButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, buttonSize), new THREE.MeshBasicMaterial({color: 0x00FFFF}));
-        linkedinButton.position.set(1, 0.3, -2);  // Move down by buttonSpacing
+        linkedinButton.position.set(1, 0, -2);  // Move down by buttonSpacing
         linkedinButton.userData.url = 'https://www.linkedin.com/in/conner-curtis/';
         //scene.add(linkedinButton);
 
         const contactButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, buttonSize), new THREE.MeshBasicMaterial({color: 0x9900FF}));
-        contactButton.position.set(2, 0.6, -2);  // Move down by 2 x buttonSpacing
+        contactButton.position.set(2, 0, -2);  // Move down by 2 x buttonSpacing
         contactButton.userData = { type: 'image', src: 'images/ContactInfo.png' };
         //scene.add(contactButton);
 
         const resumeButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, buttonSize), new THREE.MeshBasicMaterial({color: 0x6AA84F}));
-        resumeButton.position.set(3, 0.9, -2);  // Move down by 3 x buttonSpacing
+        resumeButton.position.set(3, 0, -2);  // Move down by 3 x buttonSpacing
         resumeButton.userData = { type: 'image', src: 'images/Conner_Curtis_Resume.png' };
         //scene.add(resumeButton);
 
