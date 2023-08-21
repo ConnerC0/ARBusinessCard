@@ -53,8 +53,8 @@
         const referenceSpace = await session.requestReferenceSpace('local');
 
         // Create buttons
-        const buttonSize = .1;
-        const buttonSpacing = .5; // Spacing between buttons
+        const buttonSize = .05;
+        const buttonSpacing = 1; // Spacing between buttons
         const buttonMaterial = new THREE.MeshBasicMaterial({color: 0x000000});
 
         const githubButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, buttonSize), buttonMaterial);
