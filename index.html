@@ -58,23 +58,23 @@
         const buttonMaterial = new THREE.MeshBasicMaterial({color: 0x000000});
 
         const githubButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, buttonSize), buttonMaterial);
-        githubButton.position.set(0, 0.3, 5);  // Start from the topmost button
-        //githubButton.userData = { type: 'link', url: 'https://github.com/ConnerC0' };
+        githubButton.position.set(0, 0.3, 2);  // Start from the topmost button
+        githubButton.userData = { type: 'link', url: 'https://github.com/ConnerC0' };
         scene.add(githubButton);
 
         const linkedinButton = githubButton.clone();
-        linkedinButton.position.set(0, 0.3 - buttonSpacing, 5);  // Move down by buttonSpacing
-        //linkedinButton.userData.url = 'https://www.linkedin.com/in/conner-curtis/';
+        linkedinButton.position.set(0, 0.3 - buttonSpacing, 2);  // Move down by buttonSpacing
+        linkedinButton.userData.url = 'https://www.linkedin.com/in/conner-curtis/';
         scene.add(linkedinButton);
 
         const contactButton = githubButton.clone();
-        contactButton.position.set(0, 0.3 - 2 * buttonSpacing, 5);  // Move down by 2 x buttonSpacing
-        //contactButton.userData = { type: 'image', src: 'images/ContactInfo.png' };
+        contactButton.position.set(0, 0.3 - 2 * buttonSpacing, 2);  // Move down by 2 x buttonSpacing
+        contactButton.userData = { type: 'image', src: 'images/ContactInfo.png' };
         scene.add(contactButton);
 
         const resumeButton = githubButton.clone();
-        resumeButton.position.set(0, 0.3 - 3 * buttonSpacing, 5);  // Move down by 3 x buttonSpacing
-        //resumeButton.userData = { type: 'image', src: 'images/Conner_Curtis_Resume.png' };
+        resumeButton.position.set(0, 0.3 - 3 * buttonSpacing, 2);  // Move down by 3 x buttonSpacing
+        resumeButton.userData = { type: 'image', src: 'images/Conner_Curtis_Resume.png' };
         scene.add(resumeButton);
 
         // To handle touch interactivity
