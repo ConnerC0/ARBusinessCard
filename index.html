@@ -21,7 +21,7 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
-            z-index: 10;
+            z-index: 2;
         }
     </style>
 </head>
@@ -31,184 +31,108 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+    const BUTTON_MAP = {
+        'GitHub': 'https://github.com/ConnerC0',
+        'LinkedIn': 'https://www.linkedin.com/in/conner-curtis/'
+    };
+
+    const INFO_MAP = {
+        'Resume': 'path-to-your-resume-image.jpg',
+        'Contact': 'path-to-your-contact-image.jpg'
+    };
 
     async function onButtonClicked() {
-
-        const {state} = await navigator.permissions.query({ name: 'xr' });
-        if (state === 'denied') {
-            alert('XR permissions denied. Cannot start AR.');
-            return;
-        }
         if (!navigator.xr) {
-            alert("WebXR is not supported on this device/browser.");
+            alert("WebXR not available.");
             return;
         }
 
-        // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
+        const { state } = await navigator.permissions.query({ name: 'xr' });
+        if (state === 'denied') {
+            alert('XR permissions denied.');
+            return;
+        }
+
         const canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
-        const gl = canvas.getContext("webgl", {xrCompatible: true});
-
-        if (!gl) {
-            alert("WebGL context could not be initialized. AR might not be supported.");
-            return;
-        }
+        const gl = canvas.getContext("webgl", { xrCompatible: true });
 
         const scene = new THREE.Scene();
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
-        directionalLight.position.set(10, 15, 10);
-        scene.add(directionalLight);
-
-        const renderer = new THREE.WebGLRenderer({
-            alpha: true,
-            preserveDrawingBuffer: true,
-            canvas: canvas,
-            context: gl
-        });
-        renderer.autoClear = false;
-        renderer.setSize(window.innerWidth, window.innerHeight);
-
         const camera = new THREE.PerspectiveCamera();
         camera.matrixAutoUpdate = false;
-        camera.position.z = 5;
 
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+        scene.add(directionalLight);
 
-        // Load the texture for the resume
-        const resumeTexture = new THREE.TextureLoader().load('path-to-your-resume-image.jpg');
+        const renderer = new THREE.WebGLRenderer({ alpha: true, canvas: canvas, context: gl });
+        renderer.autoClear = false;
 
-        // Global variable to store the resume plane
-        let resumePlane;
-
-        // Set up XR session
-        const session = await navigator.xr.requestSession('immersive-ar'); // To keep track of the current XR session
-
+        const session = await navigator.xr.requestSession('immersive-ar');
         session.updateRenderState({
-            baseLayer: new XRWebGLLayer(session, renderer.context)
+            baseLayer: new XRWebGLLayer(session, gl)
         });
 
         const referenceSpace = await session.requestReferenceSpace('local');
 
-        function showResume() {
-            const aspectRatio = resumeTexture.image.width / resumeTexture.image.height;
-            const planeGeometry = new THREE.PlaneGeometry(4 * aspectRatio, 4);  // Adjust the size as needed
-            const planeMaterial = new THREE.MeshBasicMaterial({map: resumeTexture, side: THREE.DoubleSide});
-            resumePlane = new THREE.Mesh(planeGeometry, planeMaterial);
-            resumePlane.position.set(0, 0, -5);
-            scene.add(resumePlane);
+        let infoPlane;
+
+        function createButton(label, x) {
+            const geometry = new THREE.BoxGeometry(0.8, 0.2, 0.05);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00FF00 });
+            const button = new THREE.Mesh(geometry, material);
+            button.position.set(x, 0, -2);
+            button.userData = { label };
+            scene.add(button);
+            return button;
         }
 
-        function onButtonClick(mesh, url) {
-            mesh.material.color.set(0xff0000);  // Change color to red as a click effect
-            setTimeout(() => {
-                mesh.material.color.set(0x007bff);  // Reset color after 500ms
-                if (url) {
-                    window.location.href = url;
-                } else {
-                    // Display contact info or resume
-                    if (mesh === resumeButton) {
-                        if (!resumePlane) {
-                            showResume();
-                        } else {
-                            scene.remove(resumePlane);
-                            resumePlane = null;
-                        }
-                    } else {
-                        // Add your showContactInfo() function logic here
-                    }
-                }
-            }, 500);
-        }
+        const buttons = [
+            createButton('GitHub', -1),
+            createButton('LinkedIn', 0),
+            createButton('Resume', 1),
+            createButton('Contact', 2)
+        ];
 
-
-        renderer.domElement.addEventListener('click', (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-
-            const intersects = raycaster.intersectObjects(scene.children);
-            for (let i = 0; i < intersects.length; i++) {
-                if (intersects[i].object === githubButton) {
-                    onButtonClick(githubButton, 'https://github.com/ConnerC0');
-                } else if (intersects[i].object === linkedinButton) {
-                    onButtonClick(linkedinButton, 'https://www.linkedin.com/in/conner-curtis/');
-                } else if (intersects[i].object === contactButton) {
-                    onButtonClick(contactButton);
-                } else if (intersects[i].object === resumeButton) {
-                    onButtonClick(resumeButton);
-                } else if (intersects[i].object === resumePlane) {
-                    scene.remove(resumePlane);
-                    resumePlane = null;
-                }
+        function handleButton(button) {
+            const label = button.userData.label;
+            if (BUTTON_MAP[label]) {
+                window.location.href = BUTTON_MAP[label];
+            } else if (INFO_MAP[label]) {
+                if (infoPlane) scene.remove(infoPlane);
+                const texture = new THREE.TextureLoader().load(INFO_MAP[label]);
+                const geometry = new THREE.PlaneGeometry(1.5, 1.5);
+                const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+                infoPlane = new THREE.Mesh(geometry, material);
+                infoPlane.position.set(0, 0, -3);
+                scene.add(infoPlane);
             }
+        }
+
+        canvas.addEventListener('touchstart', (event) => {
+            const touch = event.touches[0];
+            const x = (touch.clientX / window.innerWidth) * 2 - 1;
+            const y = -(touch.clientY / window.innerHeight) * 2 + 1;
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+
+            const intersects = raycaster.intersectObjects(buttons);
+            if (intersects.length) handleButton(intersects[0].object);
         });
 
-        // ... [Your other button setups and 3D objects]
-
-        // Define different colors for the buttons
-        const githubColor = 0xFF5733;  // Example color for Github button
-        const linkedinColor = 0x33FF57;  // Example color for LinkedIn button
-        const contactColor = 0x3357FF;  // Example color for Contact button
-        const resumeColor = 0xFF33D6;  // Example color for Resume button
-
-        // Button setup
-        const buttonGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
-
-        const githubMaterial = new THREE.MeshBasicMaterial({color: githubColor});
-        const linkedinMaterial = new THREE.MeshBasicMaterial({color: linkedinColor});
-        const contactMaterial = new THREE.MeshBasicMaterial({color: contactColor});
-        const resumeMaterial = new THREE.MeshBasicMaterial({color: resumeColor});
-
-        const githubButton = new THREE.Mesh(buttonGeometry, githubMaterial);
-        githubButton.position.set(0, 1.5, -4); // Topmost position
-        scene.add(githubButton);
-
-        const linkedinButton = new THREE.Mesh(buttonGeometry, linkedinMaterial);
-        linkedinButton.position.set(0, 0.9, -4); // 0.3 units below the Github button
-        scene.add(linkedinButton);
-
-        const contactButton = new THREE.Mesh(buttonGeometry, contactMaterial);
-        contactButton.position.set(0, 0.3, -4); // 0.6 units below the Github button
-        scene.add(contactButton);
-
-        const resumeButton = new THREE.Mesh(buttonGeometry, resumeMaterial);
-        resumeButton.position.set(0, -0.3, -4); // 0.9 units below the Github button
-        scene.add(resumeButton);
-
-        const onXRFrame = (time, frame) => {
-            // Queue up the next draw request.
-            session.requestAnimationFrame(onXRFrame);
-
-            // Bind the graphics framebuffer to the baseLayer's framebuffer
-            gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
-
-            // Retrieve the pose of the device.
-            // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
-            const pose = frame.getViewerPose(referenceSpace);
+        function render(time, xrFrame) {
+            const pose = xrFrame.getViewerPose(referenceSpace);
             if (pose) {
-                // In mobile AR, we only have one view.
                 const view = pose.views[0];
-
-                const viewport = session.renderState.baseLayer.getViewport(view);
-                renderer.setSize(viewport.width, viewport.height)
-
-                // Use the view's transform matrix and projection matrix to configure the THREE.camera.
-                camera.matrix.fromArray(view.transform.matrix)
-                camera.projectionMatrix.fromArray(view.projectionMatrix);
+                camera.matrix.fromArray(view.transform.matrix);
                 camera.updateMatrixWorld(true);
-
-
-                // Render the scene with THREE.WebGLRenderer.
-                renderer.render(scene, camera)
+                renderer.render(scene, camera);
             }
+            session.requestAnimationFrame(render);
         }
-        session.requestAnimationFrame(onXRFrame);
-    }
 
+        session.requestAnimationFrame(render);
+    }
 </script>
 </body>
-
 </html>
