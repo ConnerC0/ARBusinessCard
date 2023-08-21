@@ -31,15 +31,15 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-    const BUTTON_MAP = {
-        'GitHub': 'https://github.com/ConnerC0',
-        'LinkedIn': 'https://www.linkedin.com/in/conner-curtis/'
-    };
+    //const BUTTON_MAP = {
+        //'GitHub': 'https://github.com/ConnerC0',
+        //'LinkedIn': 'https://www.linkedin.com/in/conner-curtis/'
+   // };
 
-    const INFO_MAP = {
-        'Resume': 'path-to-your-resume-image.jpg',
-        'Contact': 'path-to-your-contact-image.jpg'
-    };
+    //const INFO_MAP = {
+       // 'Resume': 'path-to-your-resume-image.jpg',
+        //'Contact': 'path-to-your-contact-image.jpg'
+    //};
 
     async function onButtonClicked() {
         if (!navigator.xr) {
@@ -74,51 +74,9 @@
 
         const referenceSpace = await session.requestReferenceSpace('local');
 
-        let infoPlane;
+        //let infoPlane;
 
-        function createButton(label, x) {
-            const geometry = new THREE.BoxGeometry(0.8, 0.2, 0.05);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00FF00 });
-            const button = new THREE.Mesh(geometry, material);
-            button.position.set(x, 0, -2);
-            button.userData = { label };
-            scene.add(button);
-            return button;
-        }
 
-        const buttons = [
-            createButton('GitHub', -1),
-            createButton('LinkedIn', 0),
-            createButton('Resume', 1),
-            createButton('Contact', 2)
-        ];
-
-        function handleButton(button) {
-            const label = button.userData.label;
-            if (BUTTON_MAP[label]) {
-                window.location.href = BUTTON_MAP[label];
-            } else if (INFO_MAP[label]) {
-                if (infoPlane) scene.remove(infoPlane);
-                const texture = new THREE.TextureLoader().load(INFO_MAP[label]);
-                const geometry = new THREE.PlaneGeometry(1.5, 1.5);
-                const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-                infoPlane = new THREE.Mesh(geometry, material);
-                infoPlane.position.set(0, 0, -3);
-                scene.add(infoPlane);
-            }
-        }
-
-        canvas.addEventListener('touchstart', (event) => {
-            const touch = event.touches[0];
-            const x = (touch.clientX / window.innerWidth) * 2 - 1;
-            const y = -(touch.clientY / window.innerHeight) * 2 + 1;
-
-            const raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
-
-            const intersects = raycaster.intersectObjects(buttons);
-            if (intersects.length) handleButton(intersects[0].object);
-        });
 
         function render(time, xrFrame) {
             const pose = xrFrame.getViewerPose(referenceSpace);
