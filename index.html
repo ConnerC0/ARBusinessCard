@@ -68,25 +68,25 @@
         const rotationY = THREE.MathUtils.degToRad(90);
 
         const githubButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), new THREE.MeshBasicMaterial({color: 0x000000}));
-        githubButton.position.set(-1, 0, 0);  // Start from the topmost button
+        githubButton.position.set(-5, 0, 0);  // Start from the topmost button
         githubButton.rotation.y = rotationY;
         githubButton.userData = { type: 'link', url: 'https://github.com/ConnerC0' };
         scene.add(githubButton);
 
         const linkedinButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), new THREE.MeshBasicMaterial({color: 0x00FFFF}));
-        linkedinButton.position.set(-1, 0, 1.5);  // Move down by buttonSpacing
+        linkedinButton.position.set(-5, 0, 1.5);  // Move down by buttonSpacing
         linkedinButton.rotation.y = rotationY;
         linkedinButton.userData.url = 'https://www.linkedin.com/in/conner-curtis/';
         scene.add(linkedinButton);
 
         const contactButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), new THREE.MeshBasicMaterial({color: 0x9900FF}));
-        contactButton.position.set(-1, 0, 3);  // Move down by 2 x buttonSpacing
+        contactButton.position.set(-5, 0, 3);  // Move down by 2 x buttonSpacing
         contactButton.rotation.y = rotationY;
         contactButton.userData = { type: 'image', src: 'images/ContactInfo.png' };
         scene.add(contactButton);
 
         const resumeButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), new THREE.MeshBasicMaterial({color: 0x6AA84F}));
-        resumeButton.position.set(-1, 0, 4.5);  // Move down by 3 x buttonSpacing
+        resumeButton.position.set(-5, 0, 4.5);  // Move down by 3 x buttonSpacing
         resumeButton.rotation.y = rotationY;
         resumeButton.userData = { type: 'image', src: 'images/Conner_Curtis_Resume.png' };
         scene.add(resumeButton);
@@ -104,12 +104,12 @@
                 } else if (object.userData.type === 'image') {
                     if (object === contactButton)
                     {
-                        imageView.position.set(-1, 2, 3);
+                        imageView.position.set(-5, 2, 3);
                         imageView.rotation.y = rotationY;
                     }
                     if (object === resumeButton)
                     {
-                        imageView.position.set(-1, 2, 4.5);
+                        imageView.position.set(-5, 2, 4.5);
                         imageView.rotation.y = rotationY;
                     }
                     textureLoader.load(object.userData.src, (texture) => {
