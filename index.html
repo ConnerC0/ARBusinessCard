@@ -55,7 +55,7 @@
         const textureLoader = new THREE.TextureLoader();
 
         // Image Viewer (initially invisible)
-        const imageViewSize = 2; // You can adjust this as needed
+        const imageViewSize = 4; // You can adjust this as needed
         const imageMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
         const imageView = new THREE.Mesh(new THREE.PlaneGeometry(imageViewSize, imageViewSize), imageMaterial);
         imageView.position.set(0, 0, -2); // Adjust the position to ensure visibility
@@ -113,12 +113,12 @@
                 } else if (object.userData.type === 'image') {
                     if (object === contactButton)
                     {
-                        imageView.position.set(-5, 2, 0);
+                        imageView.position.set(-5, 5, 0);
                         imageView.rotation.y = rotationY;
                     }
                     if (object === resumeButton)
                     {
-                        imageView.position.set(-5, -2, 0);
+                        imageView.position.set(-5, -5, 0);
                         imageView.rotation.y = rotationY;
                     }
                     textureLoader.load(object.userData.src, (texture) => {
