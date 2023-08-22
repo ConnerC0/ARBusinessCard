@@ -51,6 +51,28 @@
         // near the viewer's position at the time the session was created.
         const referenceSpace = await session.requestReferenceSpace('local');
 
+        let initialPoseCaptured = false;
+
+        session.addEventListener('end', function() {
+            initialPoseCaptured = false;
+        });
+
+        session.addEventListener('start', function(frame) {
+            if (!initialPoseCaptured) {
+                const pose = frame.getViewerPose(referenceSpace);
+                if (pose) {
+                    const initialPosition = new THREE.Vector3().setFromMatrixPosition(pose.views[0].transform.matrix);
+
+                    githubButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 1);
+                    linkedinButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 1.5);
+                    contactButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 2);
+                    resumeButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 2.5);
+
+                    initialPoseCaptured = true;
+                }
+            }
+        });
+
         // Texture Loader for images
         const textureLoader = new THREE.TextureLoader();
 
