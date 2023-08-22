@@ -50,7 +50,33 @@
         // A 'local' reference space has a native origin that is located
         // near the viewer's position at the time the session was created.
         const referenceSpace = await session.requestReferenceSpace('local');
-        
+
+        // Improved Raycasting Setup
+        const rayOrigin = new THREE.Vector3(0, 0, 0); // Originates from the center of the camera's FOV
+        const rayDirection = new THREE.Vector3(0, 0, -1).normalize(); // Ray goes directly forward from the camera
+        const raycaster = new THREE.Raycaster(rayOrigin, rayDirection);
+
+        let initialPoseCaptured = false;
+
+        session.addEventListener('end', function() {
+            initialPoseCaptured = false;
+        });
+
+        session.addEventListener('start', function(frame) {
+            if (!initialPoseCaptured) {
+                const pose = frame.getViewerPose(referenceSpace);
+                if (pose) {
+                    const initialPosition = new THREE.Vector3().setFromMatrixPosition(pose.views[0].transform.matrix);
+
+                    githubButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 1);
+                    linkedinButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 1.5);
+                    contactButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 2);
+                    resumeButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 2.5);
+
+                    initialPoseCaptured = true;
+                }
+            }
+        });
 
         // Texture Loader for images
         const textureLoader = new THREE.TextureLoader();
@@ -70,10 +96,18 @@
         const contactTexture = textureLoader.load('images/ContactLogo.png');
         const resumeTexture = textureLoader.load('images/ResumeLogo.png');
 
-        const githubButtonMaterial = new THREE.MeshBasicMaterial({ map: githubTexture });
-        const linkedinButtonMaterial = new THREE.MeshBasicMaterial({ map: linkedinTexture });
-        const contactButtonMaterial = new THREE.MeshBasicMaterial({ map: contactTexture });
-        const resumeButtonMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture });
+        const githubButtonMaterial = new THREE.MeshBasicMaterial({
+            map: githubTexture,
+            side: THREE.DoubleSide });
+        const linkedinButtonMaterial = new THREE.MeshBasicMaterial({
+            map: linkedinTexture,
+            side: THREE.DoubleSide });
+        const contactButtonMaterial = new THREE.MeshBasicMaterial({
+            map: contactTexture,
+            side: THREE.DoubleSide });
+        const resumeButtonMaterial = new THREE.MeshBasicMaterial({
+            map: resumeTexture,
+            side: THREE.DoubleSide });
 
         const rotationY = THREE.MathUtils.degToRad(90);
 
@@ -103,7 +137,6 @@
 
         // To handle touch interactivity
         session.addEventListener('selectstart', () => {
-            const raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(new THREE.Vector2(), camera);
             const intersects = raycaster.intersectObjects([githubButton, linkedinButton, contactButton, resumeButton]);
 
