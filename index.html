@@ -13,7 +13,6 @@
 <body>
 <button onclick="activateXR()">Start Hello WebXR</button>
 <script>
-
     async function activateXR() {
         // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
         const canvas = document.createElement("canvas");
@@ -64,28 +63,38 @@
 
         // Create buttons
         const buttonSize = .5;
-        const buttonMaterial = new THREE.MeshBasicMaterial({color: 0x000000});
+
+        const githubTexture = textureLoader.load('images/GithubLogo.png');
+        const linkedinTexture = textureLoader.load('images/LinkedinLogo.png');
+        const contactTexture = textureLoader.load('images/ContactLogo.png');
+        const resumeTexture = textureLoader.load('images/ResumeLogo.png');
+
+        const githubButtonMaterial = new THREE.MeshBasicMaterial({ map: githubTexture });
+        const linkedinButtonMaterial = new THREE.MeshBasicMaterial({ map: linkedinTexture });
+        const contactButtonMaterial = new THREE.MeshBasicMaterial({ map: contactTexture });
+        const resumeButtonMaterial = new THREE.MeshBasicMaterial({ map: resumeTexture });
+
         const rotationY = THREE.MathUtils.degToRad(90);
 
-        const githubButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), new THREE.MeshBasicMaterial({color: 0x000000}));
+        const githubButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), githubButtonMaterial);
         githubButton.position.set(-5, 0, 0);  // Start from the topmost button
         githubButton.rotation.y = rotationY;
         githubButton.userData = { type: 'link', url: 'https://github.com/ConnerC0' };
         scene.add(githubButton);
 
-        const linkedinButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), new THREE.MeshBasicMaterial({color: 0x00FFFF}));
+        const linkedinButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), linkedinButtonMaterial);
         linkedinButton.position.set(-5, 0, 1.5);  // Move down by buttonSpacing
         linkedinButton.rotation.y = rotationY;
-        linkedinButton.userData.url = 'https://www.linkedin.com/in/conner-curtis/';
+        linkedinButton.userData = { type: 'link', url: 'https://www.linkedin.com/in/conner-curtis/' };
         scene.add(linkedinButton);
 
-        const contactButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), new THREE.MeshBasicMaterial({color: 0x9900FF}));
+        const contactButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), contactButtonMaterial);
         contactButton.position.set(-5, 0, 3);  // Move down by 2 x buttonSpacing
         contactButton.rotation.y = rotationY;
         contactButton.userData = { type: 'image', src: 'images/ContactInfo.png' };
         scene.add(contactButton);
 
-        const resumeButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), new THREE.MeshBasicMaterial({color: 0x6AA84F}));
+        const resumeButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), resumeButtonMaterial);
         resumeButton.position.set(-5, 0, 4.5);  // Move down by 3 x buttonSpacing
         resumeButton.rotation.y = rotationY;
         resumeButton.userData = { type: 'image', src: 'images/Conner_Curtis_Resume.png' };
