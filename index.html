@@ -26,7 +26,10 @@
 
         const scene = new THREE.Scene();
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.4 );
+        scene.add( ambientLight );
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
         directionalLight.position.set(10, 15, 10);
         scene.add(directionalLight);
 
@@ -87,7 +90,7 @@
                 bevelSegments: 5
             });
 
-            const textMaterial = new THREE.MeshPhongMaterial({ color: 0xCC0000 });
+            const textMaterial = new THREE.MeshBasicMaterial({ color: 0xFF1600 });
             const mesh1 = new THREE.Mesh(textGeometry1, textMaterial);
             const mesh2 = new THREE.Mesh(textGeometry2, textMaterial);
 
