@@ -62,8 +62,7 @@
         const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
         camera.add(reticle);
         reticle.position.x = -2; // Adjust this distance as necessary, so the reticle appears to be a comfortable distance away from the user.
-
-        renderer.render(scene, camera);
+        
         // Texture Loader for images
         const textureLoader = new THREE.TextureLoader();
 
