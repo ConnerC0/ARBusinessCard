@@ -56,6 +56,16 @@
         const rayDirection = new THREE.Vector3(0, 0, -1).normalize(); // Ray goes directly forward from the camera
         const raycaster = new THREE.Raycaster(rayOrigin, rayDirection);
 
+        const reticleSize = 0.1;
+        const reticleGeometry = new THREE.RingGeometry(0.9 * reticleSize, reticleSize, 24);
+        const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide }); // Black color
+        const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
+        reticle.position.z = -2; // Place it 2 units in front of the camera
+        reticle.rotation.x = THREE.MathUtils.degToRad(90); // Rotate to face the camera
+        camera.add(reticle);
+        scene.add(camera);
+
+
         // Texture Loader for images
         const textureLoader = new THREE.TextureLoader();
 
@@ -211,6 +221,17 @@
                             object.updateMatrixWorld(true);
                         }
                     }
+                }
+
+                // Button highlighting when hovered
+                const intersects = raycaster.intersectObjects([githubButton, linkedinButton, contactButton, resumeButton]);
+                for (let object of [githubButton, linkedinButton, contactButton, resumeButton]) {
+                    if (intersects.length > 0 && object === intersects[0].object) {
+                        object.material.opacity = 0.5;
+                    } else {
+                        object.material.opacity = 1.0;
+                    }
+                    object.material.needsUpdate = true;
                 }
 
                 // Render the scene with THREE.WebGLRenderer.
