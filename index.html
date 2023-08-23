@@ -60,7 +60,7 @@
         const reticleGeometry = new THREE.RingGeometry(0.9 * reticleSize, reticleSize, 24);
         const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide }); // Black color
         const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
-        reticle.position.z = -2; // Place it 2 units in front of the camera
+        reticle.position.z = -.01; // Place it 2 units in front of the camera
         reticle.rotation.x = THREE.MathUtils.degToRad(90); // Rotate to face the camera
         camera.add(reticle);
         scene.add(camera);
@@ -86,16 +86,20 @@
 
         const githubButtonMaterial = new THREE.MeshBasicMaterial({
             map: githubTexture,
-            side: THREE.DoubleSide });
+            side: THREE.DoubleSide,
+            transparent: true});
         const linkedinButtonMaterial = new THREE.MeshBasicMaterial({
             map: linkedinTexture,
-            side: THREE.DoubleSide });
+            side: THREE.DoubleSide,
+            transparent: true});
         const contactButtonMaterial = new THREE.MeshBasicMaterial({
             map: contactTexture,
-            side: THREE.DoubleSide });
+            side: THREE.DoubleSide,
+            transparent: true});
         const resumeButtonMaterial = new THREE.MeshBasicMaterial({
             map: resumeTexture,
-            side: THREE.DoubleSide });
+            side: THREE.DoubleSide,
+            transparent: true});
 
         const rotationY = THREE.MathUtils.degToRad(90);
 
@@ -223,7 +227,6 @@
                     }
                 }
 
-                // Button highlighting when hovered
                 const intersects = raycaster.intersectObjects([githubButton, linkedinButton, contactButton, resumeButton]);
                 for (let object of [githubButton, linkedinButton, contactButton, resumeButton]) {
                     if (intersects.length > 0 && object === intersects[0].object) {
@@ -233,6 +236,9 @@
                     }
                     object.material.needsUpdate = true;
                 }
+
+                // Update raycaster
+                raycaster.setFromCamera(new THREE.Vector2(), camera);
 
                 // Render the scene with THREE.WebGLRenderer.
                 renderer.render(scene, camera)
