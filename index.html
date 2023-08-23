@@ -42,7 +42,7 @@
         const camera = new THREE.PerspectiveCamera();
         camera.matrixAutoUpdate = false;
         // Initialize a WebXR session using "immersive-ar".
-        const session = await navigator.xr.requestSession("immersive-ar", {requiredFeatures: ['hit-test']});
+        const session = await navigator.xr.requestSession("immersive-ar", {requiredFeatures: ['hit-test', 'anchors']});
         session.updateRenderState({
             baseLayer: new XRWebGLLayer(session, gl)
         });
