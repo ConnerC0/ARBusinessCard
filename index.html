@@ -51,41 +51,10 @@
         // near the viewer's position at the time the session was created.
         const referenceSpace = await session.requestReferenceSpace('local');
 
-        //raycasting reticle
-        const reticle = new THREE.Mesh(
-            new THREE.RingGeometry(1.5, 1, 32),
-            new THREE.MeshBasicMaterial({ color: 0x000000 })
-        );
-        reticle.position.z = -2; // Starting position
-        reticle.visible = false; // Initially set to invisible
-        scene.add(reticle);
-
         // Improved Raycasting Setup
         const rayOrigin = new THREE.Vector3(0, 0, 0); // Originates from the center of the camera's FOV
         const rayDirection = new THREE.Vector3(0, 0, -1).normalize(); // Ray goes directly forward from the camera
         const raycaster = new THREE.Raycaster(rayOrigin, rayDirection);
-
-        let initialPoseCaptured = false;
-
-        session.addEventListener('end', function() {
-            initialPoseCaptured = false;
-        });
-
-        session.addEventListener('start', function(frame) {
-            if (!initialPoseCaptured) {
-                const pose = frame.getViewerPose(referenceSpace);
-                if (pose) {
-                    const initialPosition = new THREE.Vector3().setFromMatrixPosition(pose.views[0].transform.matrix);
-
-                    githubButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 1);
-                    linkedinButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 1.5);
-                    contactButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 2);
-                    resumeButton.position.set(initialPosition.x - 0.5, initialPosition.y, initialPosition.z - 2.5);
-
-                    initialPoseCaptured = true;
-                }
-            }
-        });
 
         // Texture Loader for images
         const textureLoader = new THREE.TextureLoader();
@@ -180,6 +149,34 @@
             }
         });
 
+        let anchors = [];
+        let initialPoseCaptured = false;
+
+        // Inside the 'start' event listener
+        session.addEventListener('start', async function(frame) {
+            if (!initialPoseCaptured) {
+                const pose = frame.getViewerPose(referenceSpace);
+                if (pose) {
+                    const initialPosition = new THREE.Vector3().setFromMatrixPosition(pose.views[0].transform.matrix);
+
+                    // Positions relative to the initial viewer pose
+                    githubButton.position.set(initialPosition.x, initialPosition.y, initialPosition.z - 1);
+                    linkedinButton.position.set(initialPosition.x, initialPosition.y - 0.5, initialPosition.z - 1);
+                    contactButton.position.set(initialPosition.x, initialPosition.y - 1, initialPosition.z - 1);
+                    resumeButton.position.set(initialPosition.x, initialPosition.y - 1.5, initialPosition.z - 1);
+
+                    // Create anchors for each button. Ensure the "anchors" module is in your session descriptor.
+                    const githubAnchor = await session.addAnchor(new XRRigidTransform(githubButton.matrix));
+                    const linkedinAnchor = await session.addAnchor(new XRRigidTransform(linkedinButton.matrix));
+                    const contactAnchor = await session.addAnchor(new XRRigidTransform(contactButton.matrix));
+                    const resumeAnchor = await session.addAnchor(new XRRigidTransform(resumeButton.matrix));
+
+                    anchors = [githubAnchor, linkedinAnchor, contactAnchor, resumeAnchor];
+
+                    initialPoseCaptured = true;
+                }
+            }
+        });
 
         // Create a render loop that allows us to draw on the AR view.
         const onXRFrame = (time, frame) => {
@@ -204,20 +201,16 @@
                 camera.projectionMatrix.fromArray(view.projectionMatrix);
                 camera.updateMatrixWorld(true);
 
-                // Update the raycaster's origin to match the camera's position
-                raycaster.setFromCamera(new THREE.Vector2(), camera);
-
-                const intersects = raycaster.intersectObjects([githubButton, linkedinButton, contactButton, resumeButton]);
-
-                if (intersects.length > 0) {
-                    const intersection = intersects[0];
-
-                    // Position the reticle at the intersection point
-                    reticle.position.copy(intersection.point);
-                    reticle.lookAt(camera.position); // Make sure the reticle always faces the camera
-                    reticle.visible = true;
-                } else {
-                    reticle.visible = false;
+                // Update button positions based on their anchors
+                for (let anchor of anchors) {
+                    const anchorPose = frame.getPose(anchor.space, referenceSpace);
+                    if (anchorPose) {
+                        const object = scene.getObjectByName(anchor.name); // Assumes each anchor has a name that corresponds to an object in the scene
+                        if (object) {
+                            object.matrix.fromArray(anchorPose.transform.matrix);
+                            object.updateMatrixWorld(true);
+                        }
+                    }
                 }
 
                 // Render the scene with THREE.WebGLRenderer.
