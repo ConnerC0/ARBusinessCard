@@ -60,7 +60,7 @@
         const reticleGeometry = new THREE.RingGeometry(0.9 * reticleSize, reticleSize, 24);
         const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide }); // Black color
         const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
-        reticle.position.z = -.01; // Place it 2 units in front of the camera
+        reticle.position.z = 2; // Place it 2 units in front of the camera
         reticle.rotation.x = THREE.MathUtils.degToRad(90); // Rotate to face the camera
         camera.add(reticle);
         scene.add(camera);
@@ -229,16 +229,17 @@
 
                 const intersects = raycaster.intersectObjects([githubButton, linkedinButton, contactButton, resumeButton]);
                 for (let object of [githubButton, linkedinButton, contactButton, resumeButton]) {
+                    button.material.opacity = 1.0;
                     if (intersects.length > 0 && object === intersects[0].object) {
                         object.material.opacity = 0.5;
-                    } else {
-                        object.material.opacity = 1.0;
                     }
                     object.material.needsUpdate = true;
                 }
 
                 // Update raycaster
                 raycaster.setFromCamera(new THREE.Vector2(), camera);
+                raycaster.ray.origin.setFromMatrixPosition(camera.matrixWorld);
+                raycaster.ray.direction.set(0, 0, -1).transformDirection(camera.matrixWorld);
 
                 // Render the scene with THREE.WebGLRenderer.
                 renderer.render(scene, camera)
