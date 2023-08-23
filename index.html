@@ -64,45 +64,53 @@
 
         const loader = new THREE.FontLoader();
 
+
         loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font) {
 
-            const textGeometry1 = new THREE.TextGeometry('Conner Curtis', {
-                font: font,
-                size: 0.35,    // Slightly increased the size for more profile
-                height: 0.03,  // Reduced the height for less thickness
-                curveSegments: 15,  // Increased for smoother text
-                bevelEnabled: true,
-                bevelThickness: 0.01,  // Reduced the bevel thickness
-                bevelSize: 0.03,       // Reduced the bevel size
-                bevelOffset: 0,
-                bevelSegments: 5
-            });
+            const createTextWithOutline = (text, size, height, position, rotationY, color, outlineColor) => {
+                const textGeometry = new THREE.TextGeometry(text, {
+                    font: font,
+                    size: size,
+                    height: height,
+                    curveSegments: 15,
+                    bevelEnabled: true,
+                    bevelThickness: 0.01,
+                    bevelSize: 0.03,
+                    bevelOffset: 0,
+                    bevelSegments: 5
+                });
 
-            const textGeometry2 = new THREE.TextGeometry('XR Engineer', {
-                font: font,
-                size: 0.25,    // Slightly increased the size for more profile
-                height: 0.03,  // Reduced the height for less thickness
-                curveSegments: 15,  // Increased for smoother text
-                bevelEnabled: true,
-                bevelThickness: 0.01,  // Reduced the bevel thickness
-                bevelSize: 0.03,       // Reduced the bevel size
-                bevelOffset: 0,
-                bevelSegments: 5
-            });
-            
-            const textMaterial = new THREE.MeshBasicMaterial({ color: 0xFF1600 });
-            const mesh1 = new THREE.Mesh(textGeometry1, textMaterial);
-            const mesh2 = new THREE.Mesh(textGeometry2, textMaterial);
+                const offsets = [
+                    new THREE.Vector3(0.02, 0, 0),
+                    new THREE.Vector3(-0.02, 0, 0),
+                    new THREE.Vector3(0, 0.02, 0),
+                    new THREE.Vector3(0, -0.02, 0),
+                    new THREE.Vector3(0, 0, 0.02),
+                    new THREE.Vector3(0, 0, -0.02)
+                ];
 
-            mesh1.position.set(-5, .5, 1);   // Adjust these positions as needed
-            mesh2.position.set(-5, -.5, 1);     // Adjust these positions as needed
+                // Main text
+                const textMaterial = new THREE.MeshBasicMaterial({ color: color });
+                const mainMesh = new THREE.Mesh(textGeometry, textMaterial);
+                mainMesh.position.copy(position);
+                mainMesh.rotation.y = rotationY;
+                scene.add(mainMesh);
 
-            mesh1.rotation.y = THREE.MathUtils.degToRad(90);
-            mesh2.rotation.y = THREE.MathUtils.degToRad(90);
+                // Outlines
+                const outlineMaterial = new THREE.MeshBasicMaterial({ color: outlineColor });
+                offsets.forEach(offset => {
+                    const outlineMesh = new THREE.Mesh(textGeometry, outlineMaterial);
+                    outlineMesh.position.copy(position).add(offset);
+                    outlineMesh.rotation.y = rotationY;
+                    scene.add(outlineMesh);
+                });
+            }
 
-            scene.add(mesh1);
-            scene.add(mesh2);
+            createTextWithOutline('Conner Curtis', 0.35, 0.03, new THREE.Vector3(-5, 0.5, 1), THREE.MathUtils.degToRad(90), 0xFF1600, 0x000000);
+            createTextWithOutline('XR Engineer', 0.25, 0.03, new THREE.Vector3(-5, -0.5, 1), THREE.MathUtils.degToRad(90), 0xFF1600, 0x000000);
+
         });
+
 
         // Texture Loader for images
         const textureLoader = new THREE.TextureLoader();
@@ -138,8 +146,6 @@
             map: resumeTexture,
             side: THREE.DoubleSide,
             transparent: true});
-
-        const rotationY = THREE.MathUtils.degToRad(90);
 
         const githubButton = new THREE.Mesh(new THREE.BoxGeometry(buttonSize, buttonSize, 0.2), githubButtonMaterial);
         githubButton.position.set(-5, 0, -2);  // Start from the topmost button
