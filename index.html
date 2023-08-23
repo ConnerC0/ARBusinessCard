@@ -55,7 +55,14 @@
         const rayOrigin = new THREE.Vector3(0, 0, 0); // Originates from the center of the camera's FOV
         const rayDirection = new THREE.Vector3(0, 0, -1).normalize(); // Ray goes directly forward from the camera
         const raycaster = new THREE.Raycaster(rayOrigin, rayDirection);
-        
+
+        const reticleSize = 0.05; // Adjust as needed
+        const reticleGeometry = new THREE.CircleGeometry(reticleSize, 32);
+        const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Solid white color
+        const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
+        camera.add(reticle);
+        reticle.position.z = -2; // Adjust this distance as necessary, so the reticle appears to be a comfortable distance away from the user.
+
         // Texture Loader for images
         const textureLoader = new THREE.TextureLoader();
 
