@@ -68,28 +68,28 @@
 
             const textGeometry1 = new THREE.TextGeometry('Conner Curtis', {
                 font: font,
-                size: 0.3,    // Size of the text
-                height: 0.05, // How "thick" the 3D text will be
-                curveSegments: 12,
+                size: 0.35,    // Slightly increased the size for more profile
+                height: 0.03,  // Reduced the height for less thickness
+                curveSegments: 15,  // Increased for smoother text
                 bevelEnabled: true,
-                bevelThickness: 0.02,
-                bevelSize: 0.05,
+                bevelThickness: 0.01,  // Reduced the bevel thickness
+                bevelSize: 0.03,       // Reduced the bevel size
                 bevelOffset: 0,
                 bevelSegments: 5
             });
 
             const textGeometry2 = new THREE.TextGeometry('XR Engineer', {
                 font: font,
-                size: 0.2,    // Size of the text
-                height: 0.05, // How "thick" the 3D text will be
-                curveSegments: 12,
+                size: 0.25,    // Slightly increased the size for more profile
+                height: 0.03,  // Reduced the height for less thickness
+                curveSegments: 15,  // Increased for smoother text
                 bevelEnabled: true,
-                bevelThickness: 0.02,
-                bevelSize: 0.05,
+                bevelThickness: 0.01,  // Reduced the bevel thickness
+                bevelSize: 0.03,       // Reduced the bevel size
                 bevelOffset: 0,
                 bevelSegments: 5
             });
-
+            
             const textMaterial = new THREE.MeshBasicMaterial({ color: 0xFF1600 });
             const mesh1 = new THREE.Mesh(textGeometry1, textMaterial);
             const mesh2 = new THREE.Mesh(textGeometry2, textMaterial);
