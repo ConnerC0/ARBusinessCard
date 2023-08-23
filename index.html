@@ -60,8 +60,7 @@
         const reticleGeometry = new THREE.RingGeometry(0.9 * reticleSize, reticleSize, 24);
         const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide }); // Black color
         const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
-        reticle.position.z = 2; // Place it 2 units in front of the camera
-        reticle.rotation.x = THREE.MathUtils.degToRad(90); // Rotate to face the camera
+        reticle.position.z = -2; // Place it 2 units in front of the camera
         camera.add(reticle);
         scene.add(camera);
 
